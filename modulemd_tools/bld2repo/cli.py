@@ -1,7 +1,8 @@
 import argparse
 
 from modulemd_tools.bld2repo import (
-    get_buildrequire_pkgs_from_build, add_rpm_urls, rpm_bulk_download, create_repo)
+    get_buildrequire_pkgs_from_build, add_rpm_urls, rpm_bulk_download, create_repo, filter_buildrequire_pkgs,
+    get_koji_build_info)
 from modulemd_tools.bld2repo.config import Config
 from modulemd_tools.bld2repo.utils import get_koji_session
 
@@ -26,6 +27,9 @@ def get_arg_parser():
                         default="https://kojipkgs.fedoraproject.org",
                         help=("Koji storage storage host base url. Server where the RPMs are "
                               "stored. Required to be used together with `--koji-host`."))
+    parser.add_argument("-m", "--mbs-host", type=str,
+                        default="https://mbs.fedoraproject.org",
+                        help="Module Build Service host base url.")
     return parser
 
 
@@ -40,10 +44,16 @@ def main():
         if args.koji_storage_host == koji_storage_dflt:
             parser.error("--koji-host and --koji-storage-host need to be used to together.")
 
-    config = Config(args.koji_host, args.koji_storage_host, args.arch, args.result_dir)
+    config = Config(args.koji_host, args.koji_storage_host,
+                    args.mbs_host, args.arch, args.result_dir)
+
     session = get_koji_session(config)
 
-    pkgs = get_buildrequire_pkgs_from_build(args.build_id, session, config)
+    build = get_koji_build_info(args.build_id, session, config)
+
+    pkgs = get_buildrequire_pkgs_from_build(build, session, config)
+
+    pkgs = filter_buildrequire_pkgs(build, pkgs, config)
 
     pkgs, rpm_num = add_rpm_urls(pkgs, config)
 
