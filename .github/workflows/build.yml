@@ -27,7 +27,7 @@ jobs:
       - name: Build image and push to Docker Hub and GitHub Container Registry
         uses: docker/build-push-action@v2
         with:
-          context: ./Dockerfile
+          context: .
           tags: ghcr.io/mkulik-rh/docker-builder:latest
           # build on feature branches, push only on main branch
           push: true
