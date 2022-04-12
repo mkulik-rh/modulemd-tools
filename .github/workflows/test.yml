@@ -1,26 +1,30 @@
 ---
-name: Test
+name: Tests
 
 on:
   workflow_dispatch:
   workflow_call:
+    secrets:
+      GHCR_PAT:
+        required: true
 
 jobs:
   test:
-    runs-on: self-hosted
-    concurrency: test-env
+    runs-on: ubuntu-latest
     environment: test-env
+    env:
+      SITEPACKAGES: true
+    container:
+      image: ghcr.io/${{ github.repository_owner }}/docker-builder:latest
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GHCR_PAT }}
     steps:
-      - uses: actions/checkout@v2
-      - name: (Pre) Clean up
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run linter
         run: |
-          docker rmi -f modulemd-tools
-          git clean -dfx
-      - name: Run tests in F35 docker container
+          tox -vvv -e flake8
+      - name: Run tests
         run: |
-          docker build -t modulemd-tools -f Dockerfile-tests .
-          docker run --rm -v $GITHUB_WORKSPACE:/modulemd-tools:Z modulemd-tools
-      - name: (Post) Clean up
-        run: |
-          docker rmi -f modulemd-tools
-          git clean -dfx
+          tox -vvv -e py310
