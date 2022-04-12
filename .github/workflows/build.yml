@@ -4,7 +4,7 @@ name: Build and Publish docker image
 on:
   workflow_dispatch:
 
-defaults:
+jobs:
   build-and-push-docker-image:
     name: Build Docker image and push to repositories
     runs-on: ubuntu-20.04
