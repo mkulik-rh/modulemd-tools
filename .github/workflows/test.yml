@@ -1,5 +1,5 @@
 ---
-name: Test
+name: Tests
 
 on:
   workflow_dispatch:
@@ -7,20 +7,17 @@ on:
 
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     concurrency: test-env
     environment: test-env
+    container:
+      image: ghcr.io/mkulik-rh/docker-builder:latest
+      credentials:
+        username: mkulik-rh
+        password: ${{ secrets.GHCR_PAT }}
     steps:
-      - uses: actions/checkout@v2
-      - name: (Pre) Clean up
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
         run: |
-          docker rmi -f modulemd-tools
-          git clean -dfx
-      - name: Run tests in F35 docker container
-        run: |
-          docker build -t modulemd-tools -f Dockerfile-tests .
-          docker run --rm -v $GITHUB_WORKSPACE:/modulemd-tools:Z modulemd-tools
-      - name: (Post) Clean up
-        run: |
-          docker rmi -f modulemd-tools
-          git clean -dfx
+          tox -vvv -e py310,flake8

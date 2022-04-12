@@ -1,4 +1,4 @@
-FROM fedora:36
+FROM fedora:latest
 
 RUN dnf -y update && \
     dnf -y install dnf-plugins-core && \
