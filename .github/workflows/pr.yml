@@ -1,0 +1,14 @@
+---
+name: Pull request checks
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  run-test:
+    uses: $GITHUB_REPOSITORY/.github/workflows/test.yml@master
+
+  run-build:
+    needs: run-test
+    uses: $GITHUB_REPOSITORY/.github/workflows/rpm.yml@master

@@ -1,31 +1,27 @@
 ---
-name: RPM
+name: Create RPM
 
 on:
-  pull_request:
-    branches: [master]
   workflow_dispatch:
   workflow_call:
 
 jobs:
-  test:
-    uses: rpm-software-management/modulemd-tools/.github/workflows/test.yml@master
-
   rpm:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     concurrency: test-env
     environment: test-env
-    needs: test
+    env:
+      ARCH: ${{ github.runner.arch }}
+    container:
+      image: ghcr.io/${{ github.repository_owner }}/docker-builder:latest
+      credentials:
+        username: $GITHUB_REPOSITORY_OWNER
+        password: ${{ secrets.GHCR_PAT }}
     steps:
-      - uses: actions/checkout@v2
-      - name: (Pre) Clean up
-        run: |
-          ARCH=$(uname -i)
-          git clean -dfx
-          mock --scrub all -r fedora-35-$ARCH
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Create source RPM within mock
         run: |
-          ARCH=$(uname -i)
           VERSION=$(sed -n 's/Version: //p' modulemd-tools.spec | head -1)
           git archive HEAD --prefix=modulemd-tools-$VERSION/ -o modulemd-tools-$VERSION.tar
           gzip modulemd-tools-$VERSION.tar
@@ -33,15 +29,12 @@ jobs:
           cp /var/lib/mock/fedora-35-$ARCH/result/modulemd-tools-$VERSION-*.src.rpm .
       - name: Clean up
         run: |
-          ARCH=$(uname -i)
           mock --scrub all -r fedora-35-$ARCH
       - name: Rebuild RPM within mock
         run: |
-          ARCH=$(uname -i)
           VERSION=$(sed -n 's/Version: //p' modulemd-tools.spec | head -1)
           mock -v -r fedora-35-$ARCH --postinstall rebuild modulemd-tools-$VERSION-*.src.rpm
       - name: (Post) Clean up
         run: |
-          ARCH=$(uname -i)
           git clean -dfx
           mock --scrub all -r fedora-35-$ARCH
