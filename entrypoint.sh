@@ -6,4 +6,4 @@ rm -rf .tox/ build/ dist/ modulemd_tools.egg-info/
 find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
 
-# Really important change 2 3 4 5
+# Really important change 2 3 4 5 6
