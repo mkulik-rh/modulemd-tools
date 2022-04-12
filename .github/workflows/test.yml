@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     concurrency: test-env
     environment: test-env
+    env:
+      SITEPACKAGES: true
     container:
       image: ghcr.io/mkulik-rh/docker-builder:latest
       credentials:
