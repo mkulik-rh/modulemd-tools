@@ -4,6 +4,7 @@ name: Pull request checks
 on:
   pull_request:
     branches: [master]
+    types: [synchronize]
 
 jobs:
   run-test:
