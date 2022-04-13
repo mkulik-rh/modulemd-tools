@@ -4,11 +4,13 @@ name: Create RPM
 on:
   workflow_dispatch:
   workflow_call:
+    secrets:
+      GHCR_PAT:
+        required: true
 
 jobs:
   rpm:
     runs-on: ubuntu-latest
-    concurrency: test-env
     environment: test-env
     env:
       ARCH: ${{ github.runner.arch }}
@@ -20,21 +22,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Create source RPM within mock
+      - name: Set env variables
         run: |
-          VERSION=$(sed -n 's/Version: //p' modulemd-tools.spec | head -1)
+          echo "ARCH=$(uname -i)" >> $GITHUB_ENV
+          echo "VERSION=$(sed -n 's/Version: //p' modulemd-tools.spec | head -1)" >> $GITHUB_ENV
+      - name: Create sources
+        run: |
           git archive HEAD --prefix=modulemd-tools-$VERSION/ -o modulemd-tools-$VERSION.tar
           gzip modulemd-tools-$VERSION.tar
-          mock -v -r fedora-35-$ARCH --buildsrpm --spec modulemd-tools.spec --sources modulemd-tools-$VERSION.tar.gz
-          cp /var/lib/mock/fedora-35-$ARCH/result/modulemd-tools-$VERSION-*.src.rpm .
-      - name: Clean up
+      - name: Setup directory tree
         run: |
-          mock --scrub all -r fedora-35-$ARCH
-      - name: Rebuild RPM within mock
+          rpmdev-setuptree
+      - name: Build SRPM & RPM
         run: |
-          VERSION=$(sed -n 's/Version: //p' modulemd-tools.spec | head -1)
-          mock -v -r fedora-35-$ARCH --postinstall rebuild modulemd-tools-$VERSION-*.src.rpm
-      - name: (Post) Clean up
-        run: |
-          git clean -dfx
-          mock --scrub all -r fedora-35-$ARCH
+          cp modulemd-tools-$VERSION.tar.gz $HOME/rpmbuild/SOURCES/
+          cp modulemd-tools.spec $HOME/rpmbuild/SPECS/
+          rpmbuild -ba $HOME/rpmbuild/SPECS/modulemd-tools.spec

@@ -4,12 +4,15 @@ name: Pull request checks
 on:
   pull_request:
     branches: [master]
-    types: [synchronize]
+    types: [opened, synchronize, reopened, unlocked, edited]
 
 jobs:
   run-test:
-    uses: $GITHUB_REPOSITORY/.github/workflows/test.yml@master
-
+    uses: ./.github/workflows/test.yml
+    secrets:
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
   run-build:
     needs: run-test
-    uses: $GITHUB_REPOSITORY/.github/workflows/rpm.yml@master
+    uses: ./.github/workflows/rpm.yml
+    secrets:
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}

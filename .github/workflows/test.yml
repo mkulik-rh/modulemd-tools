@@ -4,18 +4,20 @@ name: Tests
 on:
   workflow_dispatch:
   workflow_call:
+    secrets:
+      GHCR_PAT:
+        required: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    concurrency: test-env
     environment: test-env
     env:
       SITEPACKAGES: true
     container:
-      image: ghcr.io/mkulik-rh/docker-builder:latest
+      image: ghcr.io/${{ github.repository_owner }}/docker-builder:latest
       credentials:
-        username: mkulik-rh
+        username: ${{ github.repository_owner }}
         password: ${{ secrets.GHCR_PAT }}
     steps:
       - name: Checkout code
