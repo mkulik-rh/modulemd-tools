@@ -4,17 +4,23 @@ name: Tests
 on:
   workflow_dispatch:
     inputs:
-      test-type:
+      test_type:
         type: choice
         required: true
         description: Select type of tests
         options:
           - flake8
           - py310
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
   workflow_call:
     inputs:
-      test-type:
+      test_type:
         required: true
+        type: string
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -23,7 +29,7 @@ on:
 
 jobs:
   test:
-    name: Run ${{ inputs.test-type }}
+    name: Run ${{ inputs.test_type }}
     runs-on: ubuntu-latest
     environment: test-env
     env:
@@ -36,6 +42,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Run ${{ inputs.test-type }}
+      - name: Run ${{ inputs.test_type }}
         run: |
-          tox -vvv -e ${{ inputs.test-type }}
+          tox -vvv -e ${{ inputs.test_type }}
