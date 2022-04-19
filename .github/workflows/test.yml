@@ -43,6 +43,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Install packages
+        run: |
+          dnf install -y tox
       - name: Run ${{ inputs.test_type }}
         run: |
           tox -vvv -e ${{ inputs.test_type }}
