@@ -11,11 +11,11 @@ jobs:
   run-linter:
     uses: ./.github/workflows/test.yml
     with:
-      test-type: flake8
+      test_type: flake8
   run-pytest:
     uses: ./.github/workflows/test.yml
     with:
-      test-type: py310
+      test_type: py310
   run-build:
     needs: [run-linter, run-pytest]
     uses: ./.github/workflows/rpm.yml
