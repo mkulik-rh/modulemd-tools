@@ -8,13 +8,22 @@ on:
     types: [opened, synchronize, reopened, unlocked, edited]
 
 jobs:
-  run-test:
+  run-linter:
     uses: ./.github/workflows/test.yml
+    inputs:
+      test-type: flake8
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  run-pytest:
+    uses: ./.github/workflows/test.yml
+    inputs:
+      test-type: py310
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   run-build:
-    needs: run-test
+    needs: [run-linter, run-pytest]
     uses: ./.github/workflows/rpm.yml
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}

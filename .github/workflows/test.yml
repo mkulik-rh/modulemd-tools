@@ -2,43 +2,45 @@
 name: Tests
 
 on:
+  workflow_dispatch:
+    inputs:
+      test-type:
+        type: choice
+        required: true
+        description: Select type of tests
+        options:
+          - flake8
+          - py310
   workflow_call:
+    inputs:
+      test-type:
+        type: choice
+        required: true
+        description: Select type of tests
+        options:
+          - flake8
+          - py310
     secrets:
       DOCKERHUB_USERNAME:
         required: true
       DOCKERHUB_TOKEN:
         required: true
 
-env:
-  SITEPACKAGES: true
-  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-
 jobs:
   test:
-    name: Run ${{ matrix.test_name }}
+    name: Run ${{ inputs.test-type }}
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        test_type: [flake8, py310]
-        include:
-          - test_type: flake8
-            test_name: linter
-          - test_type: py310
-            test_name: tests
     environment: test-env
     env:
       SITEPACKAGES: true
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     container:
-      image: ${{ env.DOCKERHUB_USERNAME }}/modulemd_tools_tests:latest
+      image: ${{ secrets.DOCKERHUB_USERNAME }}/modulemd_tools_tests:latest
       credentials:
-        username: ${{ env.DOCKERHUB_USERNAME }}
-        password: ${{ env.DOCKERHUB_TOKEN }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Run ${{ matrix.test_name }}
+      - name: Run ${{ inputs.test-type }}
         run: |
-          tox -vvv -e ${{ matrix.test_type }}
+          tox -vvv -e ${{ inputs.test-type }}
