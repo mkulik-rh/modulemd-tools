@@ -14,12 +14,7 @@ on:
   workflow_call:
     inputs:
       test-type:
-        type: choice
         required: true
-        description: Select type of tests
-        options:
-          - flake8
-          - py310
     secrets:
       DOCKERHUB_USERNAME:
         required: true
