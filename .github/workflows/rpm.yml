@@ -4,11 +4,6 @@ name: Create RPM
 on:
   workflow_dispatch:
   workflow_call:
-    secrets:
-      DOCKERHUB_USERNAME:
-        required: true
-      DOCKERHUB_TOKEN:
-        required: true
 
 jobs:
   rpm:
@@ -18,10 +13,6 @@ jobs:
       ARCH: ${{ github.runner_arch }}
     container:
       image: ghcr.io/rpm-software-management/dnf-ci-host
-      # image: ${{ secrets.DOCKERHUB_USERNAME }}/modulemd_tools_tests:latest
-      # credentials:
-      #   username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #   password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

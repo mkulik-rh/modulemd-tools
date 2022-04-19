@@ -11,21 +11,11 @@ on:
         options:
           - flake8
           - py310
-    secrets:
-      DOCKERHUB_USERNAME:
-        required: true
-      DOCKERHUB_TOKEN:
-        required: true
   workflow_call:
     inputs:
       test_type:
         required: true
         type: string
-    secrets:
-      DOCKERHUB_USERNAME:
-        required: true
-      DOCKERHUB_TOKEN:
-        required: true
 
 jobs:
   test:
@@ -36,10 +26,6 @@ jobs:
       SITEPACKAGES: true
     container:
       image: ghcr.io/rpm-software-management/dnf-ci-host
-      # image: test/modulemd_tools_tests:latest
-      # credentials:
-      #   username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #   password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
