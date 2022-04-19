@@ -9,6 +9,11 @@ on:
       DOCKERHUB_TOKEN:
         required: true
 
+env:
+  SITEPACKAGES: true
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
 jobs:
   test:
     name: Run ${{ matrix.test_name }}
@@ -19,22 +24,18 @@ jobs:
         include:
           - test_type: flake8
             test_name: linter
-            DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-            DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           - test_type: py310
             test_name: tests
-            DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-            DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     environment: test-env
     env:
       SITEPACKAGES: true
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     container:
-      image: ${{ matrix.DOCKERHUB_USERNAME }}/modulemd_tools_tests:latest
+      image: ${{ env.DOCKERHUB_USERNAME }}/modulemd_tools_tests:latest
       credentials:
-        username: ${{ matrix.DOCKERHUB_USERNAME }}
-        password: ${{ matrix.DOCKERHUB_TOKEN }}
+        username: ${{ env.DOCKERHUB_USERNAME }}
+        password: ${{ env.DOCKERHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
