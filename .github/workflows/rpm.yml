@@ -12,7 +12,7 @@ jobs:
     env:
       ARCH: ${{ github.runner_arch }}
     container:
-      image: ghcr.io/rpm-software-management/dnf-ci-host
+      image: ghcr.io/mkulik-rh/modulemd_tools-ci:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
