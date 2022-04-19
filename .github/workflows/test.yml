@@ -46,6 +46,6 @@ jobs:
       - name: Install packages
         run: |
           dnf install -y tox
-      - name: Run ${{ inputs.test_type }}
+      - name: Run ${{ github.event.inputs.test_type }}
         run: |
-          tox -vvv -e ${{ inputs.test_type }}
+          tox -vvv -e ${{ github.event.inputs.test_type }}
