@@ -5,26 +5,35 @@ on:
   workflow_dispatch:
   workflow_call:
     secrets:
-      GHCR_PAT:
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
         required: true
 
 jobs:
   test:
+    name: Run ${{ matrix.test_name }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_type: [flake8, py310]
+        include:
+          - test_type: flake8
+            test_name: linter
+          - test_type: py310
+            test_name: tests
     environment: test-env
     env:
       SITEPACKAGES: true
     container:
-      image: ghcr.io/${{ github.repository_owner }}/docker-builder:latest
+      image: ${{ secrets.DOCKERHUB_USERNAME }}/modulemd_tools_tests:latest
       credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GHCR_PAT }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Run linter
+      - name: Run ${{ matrix.test_name }}
         run: |
-          tox -vvv -e flake8
-      - name: Run tests
-        run: |
-          tox -vvv -e py310
+          tox -vvv -e ${{ matrix.test_type }}
