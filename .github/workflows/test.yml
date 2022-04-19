@@ -25,13 +25,10 @@ jobs:
     env:
       SITEPACKAGES: true
     container:
-      image: ghcr.io/rpm-software-management/dnf-ci-host
+      image: ghcr.io/mkulik-rh/modulemd_tools-ci:latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Install packages
-        run: |
-          dnf install -y tox
       - name: Run ${{ github.event.inputs.test_type }}
         run: |
           tox -vvv -e ${{ github.event.inputs.test_type }}

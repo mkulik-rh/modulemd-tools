@@ -12,19 +12,10 @@ jobs:
     uses: ./.github/workflows/test.yml
     with:
       test-type: flake8
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   run-pytest:
     uses: ./.github/workflows/test.yml
     with:
       test-type: py310
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   run-build:
     needs: [run-linter, run-pytest]
     uses: ./.github/workflows/rpm.yml
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
