@@ -30,5 +30,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run ${{ github.event.inputs.test_type }}
+        if: "${{ github.event.inputs.test_type != '' }}"
         run: |
           tox -vvv -e ${{ github.event.inputs.test_type }}
+      - name: Run ${{ inputs.test_type }}
+        if: "${{ inputs.test_type != '' }}"
+        run: |
+          tox -vvv -e ${{ inputs.test_type }}
