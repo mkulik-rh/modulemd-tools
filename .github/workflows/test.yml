@@ -34,8 +34,9 @@ jobs:
     environment: test-env
     env:
       SITEPACKAGES: true
+      TEST: test
     container:
-      image: ${{ secrets.DOCKERHUB_USERNAME }}/modulemd_tools_tests:latest
+      image: ${{ env.TEST }}/modulemd_tools_tests:latest
       credentials:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
